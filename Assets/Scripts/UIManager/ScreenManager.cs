@@ -1,9 +1,10 @@
+using System;
 using UnityEngine;
 
 public class ScreenManager : MonoBehaviour
 {
     // 1. Serializable struct to map the ScreenType to a GameObject
-    [System.Serializable]
+    [Serializable]
     public struct ScreenEntry
     {
         public ScreenType type;
@@ -12,6 +13,12 @@ public class ScreenManager : MonoBehaviour
 
     // Array to hold all your screens
     [SerializeField] private ScreenEntry[] screens;
+
+    /// <summary>The screen that is currently shown.</summary>
+    public ScreenType CurrentScreen { get; private set; } = ScreenType.ScreenMain;
+
+    /// <summary>Raised after every successful switch: (previous screen, new screen).</summary>
+    public event Action<ScreenType, ScreenType> ScreenChanged;
 
     private void Start()
     {
@@ -41,7 +48,13 @@ public class ScreenManager : MonoBehaviour
             }
         }
 
-        if (!targetFound)
+        if (targetFound)
+        {
+            ScreenType previous = CurrentScreen;
+            CurrentScreen = targetScreen;
+            ScreenChanged?.Invoke(previous, targetScreen);
+        }
+        else
         {
             Debug.LogWarning($"[ScreenManager] Target screen '{targetScreen}' was not found in the screens array.");
         }
