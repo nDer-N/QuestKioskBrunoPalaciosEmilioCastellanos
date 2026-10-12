@@ -109,7 +109,7 @@ public class ScreenDateController : MonoBehaviour
 
     // ---------------------------------------------------------------- clock
 
-    private DateTime GetNow()
+    public DateTime GetNow()
     {
         if (useDebugNow && DateTime.TryParse(debugNow, out DateTime parsed)) return parsed;
         return DateTime.Now; // device clock
