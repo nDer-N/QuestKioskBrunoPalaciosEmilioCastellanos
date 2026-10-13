@@ -127,9 +127,9 @@ public class ScreenKitSelectionController : MonoBehaviour
     [SerializeField] private string statusObjectName = "STATUS";
     [SerializeField] private Color availableColor = new Color(0.1f, 0.8f, 0.1f);
     [SerializeField] private Color unavailableColor = new Color(0.85f, 0.15f, 0.15f);
-    [SerializeField] public GameObject noKits;
-    [SerializeField] private bool noKitsAvailable;
-
+    [SerializeField] private Color reservedColor = new Color(0.85f, 0.15f, 0.15f);
+    [SerializeField] public GameObject noKits;                // "NoKits" object, shown when no kit is available
+    [SerializeField] private bool noKitsAvailable;            // true while all 6 kits are unavailable (visible for debugging)
 
     [Header("Navigation")]
     [SerializeField] private ScreenManager screenManager;
@@ -238,7 +238,7 @@ public class ScreenKitSelectionController : MonoBehaviour
 
     // ---------------------------------------------------------------- refresh
 
-   private void Refresh()
+    private void Refresh()
     {
         if (!built) return;
 
@@ -261,7 +261,15 @@ public class ScreenKitSelectionController : MonoBehaviour
             if (views[i].statusText != null)
             {
                 views[i].statusText.text = kit.StatusLabel;
-                views[i].statusText.color = kit.IsAvailable ? availableColor : unavailableColor;
+                if(kit.status == KitStatus.Reserved)
+                {
+                    views[i].statusText.color = reservedColor;
+                }
+                else
+                {
+                    views[i].statusText.color = kit.IsAvailable ? availableColor : unavailableColor;
+                }
+                
             }
         }
 
@@ -270,7 +278,6 @@ public class ScreenKitSelectionController : MonoBehaviour
         if (noKits != null)
             noKits.SetActive(noKitsAvailable);
     }
-
 
     // ---------------------------------------------------------------- click
 

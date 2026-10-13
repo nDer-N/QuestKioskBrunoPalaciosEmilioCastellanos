@@ -1677,10 +1677,10 @@ MonoBehaviour:
   m_Transition: 1
   m_Colors:
     m_NormalColor: {r: 1, g: 0, b: 0.03447914, a: 1}
-    m_HighlightedColor: {r: 0.94896305, g: 1, b: 0, a: 1}
-    m_PressedColor: {r: 1, g: 0.70595765, b: 0, a: 1}
-    m_SelectedColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
-    m_DisabledColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
+    m_HighlightedColor: {r: 0.509434, g: 0.030235043, b: 0, a: 1}
+    m_PressedColor: {r: 0.3660378, g: 0.026779527, b: 0, a: 1}
+    m_SelectedColor: {r: 1, g: 0.06992592, b: 0.015686274, a: 1}
+    m_DisabledColor: {r: 1, g: 0.70198613, b: 0.65471697, a: 1}
     m_ColorMultiplier: 1
     m_FadeDuration: 0.1
   m_SpriteState:
@@ -4780,6 +4780,7 @@ GameObject:
   - component: {fileID: 678711058}
   - component: {fileID: 678711060}
   - component: {fileID: 678711059}
+  - component: {fileID: 678711061}
   m_Layer: 5
   m_Name: ScreenLoanReceipt
   m_TagString: Untagged
@@ -4851,6 +4852,25 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 678711057}
   m_CullTransparentMesh: 1
+--- !u!114 &678711061
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 678711057}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 577e53b088b776449ae361fa244063e4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ScreenLoanReceiptController
+  kitNumberText: {fileID: 660680349}
+  dateText: {fileID: 801496344}
+  startTimeText: {fileID: 2444732}
+  endTimeText: {fileID: 1346145063}
+  exitButton: {fileID: 248169248}
+  screenManager: {fileID: 305245494}
+  nextScreen: 0
 --- !u!1 &691096451
 GameObject:
   m_ObjectHideFlags: 0
@@ -4964,6 +4984,7 @@ GameObject:
   - component: {fileID: 696039573}
   - component: {fileID: 696039575}
   - component: {fileID: 696039574}
+  - component: {fileID: 696039576}
   m_Layer: 5
   m_Name: ScreenNotAvailable
   m_TagString: Untagged
@@ -5029,6 +5050,20 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 696039572}
   m_CullTransparentMesh: 1
+--- !u!114 &696039576
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 696039572}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4abea7a5b0b34784794f4ce18322ace1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ScreenNotAvailableController
+  statusText: {fileID: 1649480520}
+  closeButton: {fileID: 1929963259}
 --- !u!1 &704254249
 GameObject:
   m_ObjectHideFlags: 0
@@ -10174,8 +10209,13 @@ MonoBehaviour:
   statusObjectName: STATUS
   availableColor: {r: 0.1, g: 0.8, b: 0.1, a: 1}
   unavailableColor: {r: 0.85, g: 0.15, b: 0.15, a: 1}
+  reservedColor: {r: 1, g: 0.5819608, b: 0, a: 1}
+  noKits: {fileID: 752228883}
+  noKitsAvailable: 1
   screenManager: {fileID: 305245494}
   nextScreen: 4
+  notAvailableOverlay: {fileID: 696039576}
+  dateController: {fileID: 1002160204}
   debugKitToReserve: 1
 --- !u!1 &1898189555
 GameObject:
@@ -10419,7 +10459,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1929963260}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 305245494}
+        m_TargetAssemblyTypeName: ScreenManager, Assembly-CSharp
+        m_MethodName: SwitchScreenByIndex
+        m_Mode: 3
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 3
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &1929963260
 MonoBehaviour:
   m_ObjectHideFlags: 0
