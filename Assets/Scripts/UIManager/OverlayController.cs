@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using TMPro;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using UnityEngine.UI;
 
 /// <summary>
@@ -9,6 +10,7 @@ using UnityEngine.UI;
 /// - Back button: visible on every screen except ScreenMain. Goes back to the screen the user came from.
 ///   BookingStore.Reset() is called only when backing up onto ScreenMain.
 /// - Clock: shows the same "now" as ScreenDateController (device clock, or its debug time).
+/// - Dev panel: pressing R (new Input System) opens/closes it; its button clears every saved reservation.
 /// </summary>
 public class OverlayController : MonoBehaviour
 {
@@ -22,6 +24,10 @@ public class OverlayController : MonoBehaviour
     [Header("Clock")]
     [SerializeField] private TMP_Text clockText;                    // HourText
 
+    [Header("Dev panel (toggle with the R key)")]
+    [SerializeField] private GameObject devPanel;                   // DevPanel
+    [SerializeField] private Button resetReservationsButton;        // DevPanel/Button
+
     private readonly Stack<ScreenType> history = new Stack<ScreenType>();
     private bool goingBack;
     private string lastClock;
@@ -31,11 +37,13 @@ public class OverlayController : MonoBehaviour
     private void Awake()
     {
         if (backButton != null) backButton.onClick.AddListener(OnBackClicked);
+        if (resetReservationsButton != null) resetReservationsButton.onClick.AddListener(OnResetReservationsClicked);
     }
 
     private void OnDestroy()
     {
         if (backButton != null) backButton.onClick.RemoveListener(OnBackClicked);
+        if (resetReservationsButton != null) resetReservationsButton.onClick.RemoveListener(OnResetReservationsClicked);
     }
 
     private void OnEnable()
@@ -46,6 +54,8 @@ public class OverlayController : MonoBehaviour
             UpdateBackButton(screenManager.CurrentScreen);
         }
 
+        if (devPanel != null) devPanel.SetActive(false); // always starts closed
+
         lastClock = null;
         InvokeRepeating(nameof(UpdateClock), 0f, 1f);
     }
@@ -54,6 +64,27 @@ public class OverlayController : MonoBehaviour
     {
         if (screenManager != null) screenManager.ScreenChanged -= OnScreenChanged;
         CancelInvoke(nameof(UpdateClock));
+    }
+
+    // ---------------------------------------------------------------- dev panel
+
+    private void Update()
+    {
+        Keyboard keyboard = Keyboard.current; // null if no keyboard is connected
+        if (keyboard != null && keyboard.rKey.wasPressedThisFrame)
+            ToggleDevPanel();
+    }
+
+    private void ToggleDevPanel()
+    {
+        if (devPanel == null) return;
+        devPanel.SetActive(!devPanel.activeSelf);
+    }
+
+    private void OnResetReservationsClicked()
+    {
+        BookingStore.ClearReservations();
+        Debug.Log("[Overlay] All reservations cleared.");
     }
 
     // ---------------------------------------------------------------- navigation
