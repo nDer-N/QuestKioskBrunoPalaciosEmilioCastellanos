@@ -111,7 +111,7 @@ public class KitObject
 /// Put this on the ScreenKitSelection GameObject.
 /// Builds one KitOption button per kit (always 6), shows its number and status, and handles clicks:
 ///   available   -> stores the kit number in BookingStore and goes to the next screen
-///   unavailable -> logs "KIT UNAVAILABLE"
+///   unavailable -> shows the not-available overlay on top of this screen (and logs "KIT UNAVAILABLE")
 /// </summary>
 public class ScreenKitSelectionController : MonoBehaviour
 {
@@ -127,11 +127,11 @@ public class ScreenKitSelectionController : MonoBehaviour
     [SerializeField] private string statusObjectName = "STATUS";
     [SerializeField] private Color availableColor = new Color(0.1f, 0.8f, 0.1f);
     [SerializeField] private Color unavailableColor = new Color(0.85f, 0.15f, 0.15f);
-    [SerializeField] private Color reservedColor = new Color (0.85f, 0.30f, 0.15f);
 
     [Header("Navigation")]
     [SerializeField] private ScreenManager screenManager;
     [SerializeField] private ScreenType nextScreen = ScreenType.ScreenKitInfo;
+    [SerializeField] private ScreenNotAvailableController notAvailableOverlay; // shown on top when an unavailable kit is clicked
 
     [Header("Clock")]
     [SerializeField] private ScreenDateController dateController; // same "now" as the date screen (includes its debug time)
@@ -254,15 +254,7 @@ public class ScreenKitSelectionController : MonoBehaviour
             if (views[i].statusText != null)
             {
                 views[i].statusText.text = kit.StatusLabel;
-                if (kit.status == KitStatus.Reserved)
-                {
-                    views[i].statusText.color = reservedColor;
-                } else
-                {
-                    views[i].statusText.color = kit.IsAvailable ? availableColor : unavailableColor;
-                }
-                
-                
+                views[i].statusText.color = kit.IsAvailable ? availableColor : unavailableColor;
             }
         }
     }
@@ -276,6 +268,12 @@ public class ScreenKitSelectionController : MonoBehaviour
         if (!kit.IsAvailable)
         {
             Debug.Log("KIT UNAVAILABLE");
+
+            if (notAvailableOverlay != null)
+                notAvailableOverlay.Show(kit.StatusLabel);
+            else
+                Debug.LogWarning("[ScreenKitSelection] Not Available Overlay isn't assigned.");
+
             return;
         }
 
