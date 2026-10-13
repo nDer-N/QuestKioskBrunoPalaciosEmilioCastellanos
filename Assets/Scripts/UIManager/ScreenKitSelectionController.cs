@@ -60,11 +60,12 @@ public class KitObject
     /// <summary>
     /// Checks this kit against every confirmed reservation for the slot the user asked for
     /// (request.date + request.time, lasting request.timeInterval minutes) and stores the result in 'status'.
-    ///   LOANED   = a booking of this kit already covers the moment the user wants to start.
-    ///   RESERVED = a booking of this kit overlaps the requested slot, but not at its start moment.
-    ///   AVAILABLE = no overlap.
+    ///   AVAILABLE = no booking of this kit overlaps the requested slot.
+    ///   LOANED    = an overlapping booking is active RIGHT NOW (start <= now < end): the kit is physically out.
+    ///   RESERVED  = an overlapping booking exists, but it isn't active now (later today or another day).
+    /// 'now' should be the same clock the rest of the app uses (ScreenDateController.GetNow()).
     /// </summary>
-    public KitStatus CheckAvailability(BookingData request, IReadOnlyList<BookingData> reservations)
+    public KitStatus CheckAvailability(BookingData request, IReadOnlyList<BookingData> reservations, DateTime now)
     {
         status = KitStatus.Available;
 
@@ -92,8 +93,8 @@ public class KitObject
             bool overlaps = start < reqEnd && reqStart < end;
             if (!overlaps) continue;
 
-            // The requested start moment falls inside this booking -> the kit is out at that time
-            if (reqStart >= start && reqStart < end)
+            // This booking is happening right now -> the kit is physically out
+            if (start <= now && now < end)
             {
                 status = KitStatus.Loaned;
                 return status; // LOANED wins over RESERVED
@@ -110,7 +111,7 @@ public class KitObject
 /// Put this on the ScreenKitSelection GameObject.
 /// Builds one KitOption button per kit (always 6), shows its number and status, and handles clicks:
 ///   available   -> stores the kit number in BookingStore and goes to the next screen
-///   unavailable -> logs "KIT UNAVAILABLE"
+///   unavailable -> shows the not-available overlay on top of this screen (and logs "KIT UNAVAILABLE")
 /// </summary>
 public class ScreenKitSelectionController : MonoBehaviour
 {
@@ -130,6 +131,10 @@ public class ScreenKitSelectionController : MonoBehaviour
     [Header("Navigation")]
     [SerializeField] private ScreenManager screenManager;
     [SerializeField] private ScreenType nextScreen = ScreenType.ScreenKitInfo;
+    [SerializeField] private ScreenNotAvailableController notAvailableOverlay; // shown on top when an unavailable kit is clicked
+
+    [Header("Clock")]
+    [SerializeField] private ScreenDateController dateController; // same "now" as the date screen (includes its debug time)
 
     [Header("Debug")]
     [SerializeField] private int debugKitToReserve = 1;
@@ -197,6 +202,9 @@ public class ScreenKitSelectionController : MonoBehaviour
         if (built) return;
         built = true;
 
+        if (dateController == null)
+            Debug.LogWarning("[ScreenKitSelection] Date Controller isn't assigned; using the real device clock for LOANED checks.");
+
         EnsureKits();
         views = new KitView[KitCount];
 
@@ -233,11 +241,12 @@ public class ScreenKitSelectionController : MonoBehaviour
 
         BookingData request = BookingStore.Data;
         IReadOnlyList<BookingData> reservations = BookingStore.Reservations;
+        DateTime now = dateController != null ? dateController.GetNow() : DateTime.Now;
 
         for (int i = 0; i < KitCount; i++)
         {
             KitObject kit = kits[i];
-            kit.CheckAvailability(request, reservations);
+            kit.CheckAvailability(request, reservations, now);
 
             if (views[i].numberText != null)
                 views[i].numberText.text = kit.kitNumber.ToString();
@@ -259,6 +268,12 @@ public class ScreenKitSelectionController : MonoBehaviour
         if (!kit.IsAvailable)
         {
             Debug.Log("KIT UNAVAILABLE");
+
+            if (notAvailableOverlay != null)
+                notAvailableOverlay.Show(kit.StatusLabel);
+            else
+                Debug.LogWarning("[ScreenKitSelection] Not Available Overlay isn't assigned.");
+
             return;
         }
 
