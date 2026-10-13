@@ -8,7 +8,7 @@ The interface design is based directly on a prototype previously developed in Fi
 
 The video showing how the program works can be seen here: https://drive.google.com/drive/folders/1OeyB4f7E9i5hO4HDFs-Tn9OcssfGsgVX?usp=sharing
 
-Other specifications of the project can be readed here:
+Other specifications of the project can be read here:
 
 - [Design](Documentation/docs_design.md)
 
