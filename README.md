@@ -10,11 +10,11 @@ The video showing how the program works can be seen here: https://drive.google.c
 
 Other specifications of the project can be readed here:
 
-- [Design](docs_design.md)
+- [Design](Documentation/docs_design.md)
 
-- [Testing](docs_testing.md)
+- [Testing](Documentation/docs_testing.md)
 
-- [AiUse](docs_ai-use.md)
+- [AiUse](Documentation/docs_ai-use.md)
 
  
 
