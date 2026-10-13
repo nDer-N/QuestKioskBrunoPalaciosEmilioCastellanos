@@ -126,6 +126,9 @@ public class ScreenKitSelectionController : MonoBehaviour
     [SerializeField] private string statusObjectName = "STATUS";
     [SerializeField] private Color availableColor = new Color(0.1f, 0.8f, 0.1f);
     [SerializeField] private Color unavailableColor = new Color(0.85f, 0.15f, 0.15f);
+    [SerializeField] public GameObject noKits;
+    [SerializeField] private bool noKitsAvailable;
+
 
     [Header("Navigation")]
     [SerializeField] private ScreenManager screenManager;
@@ -227,17 +230,21 @@ public class ScreenKitSelectionController : MonoBehaviour
 
     // ---------------------------------------------------------------- refresh
 
-    private void Refresh()
+   private void Refresh()
     {
         if (!built) return;
 
         BookingData request = BookingStore.Data;
         IReadOnlyList<BookingData> reservations = BookingStore.Reservations;
 
+        int availableCount = 0;
+
         for (int i = 0; i < KitCount; i++)
         {
             KitObject kit = kits[i];
             kit.CheckAvailability(request, reservations);
+
+            if (kit.IsAvailable) availableCount++;
 
             if (views[i].numberText != null)
                 views[i].numberText.text = kit.kitNumber.ToString();
@@ -248,7 +255,13 @@ public class ScreenKitSelectionController : MonoBehaviour
                 views[i].statusText.color = kit.IsAvailable ? availableColor : unavailableColor;
             }
         }
+
+        noKitsAvailable = availableCount == 0;
+
+        if (noKits != null)
+            noKits.SetActive(noKitsAvailable);
     }
+
 
     // ---------------------------------------------------------------- click
 
